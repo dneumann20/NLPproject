@@ -80,9 +80,10 @@ In this project, following tools and packages were used for corresponding purpos
 \section{Implementation}\label{sec:implementation}
 
 \subsection{Preliminary Work}
-For the purposes of understanding and for avoiding recurring code segments, this short chapter shows code segments related to the implementations in the following chapters.
+For the purposes of understanding and for avoiding recurring code snippets, this short chapter shows code snippets related to the implementations in the following chapters.
 
 \subsubsection{Visualization of Synsets and Results}
+
 To visualize the similarity results for the synsets defined in~\ref{sec:methodology}, the synset pairs will be saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
 
 \begin{lstlisting}[frame=single, label=lst:table, caption={}, captionpos=b]]
@@ -96,7 +97,8 @@ for i in range(len(synsets)):
 \end{lstlisting}
 
 \subsubsection{Pre-Processing function}\label{sec:preproc}
-In case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character as well as stopwords. The code segment~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the help of the Regular expression operations package \textbf{re}.
+
+In case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character as well as stopwords. The code snippet~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the help of the Regular expression operations package \textbf{re}.
 
 \begin{lstlisting}[frame=single, label=lst:preproc, caption={Pre-processing for synsets of word length>1}, captionpos=b]]
 def pre_processing(text):
@@ -117,11 +119,13 @@ def pre_processing(text):
 \end{lstlisting}
 
 \subsection{WebJaccard page count similarity}\label{subsec:webjac}
-The first task consisted of implementing the WebJaccard similarity based on page count and calculate the similarity coefficient. Where \textit{H(P)} in \ref{fig:pagecount} are the results of the pair key P and \textit{H(Q)} the results of pair key Q, \textit{H(PQ)} are the results when searching for P and Q together. This similarity coefficient  is calculated as followed:
-\begin{figure}[h]\label{fig:pagecount}
+
+The first task consisted of implementing the WebJaccard similarity based on page count and calculate the similarity coefficient. Where \textit{H(P)} in \ref{fig:pagecount} are the results of the pair key P and \textit{H(Q)} the results of pair key Q, \textit{H(PQ)} are the results when searching for P and Q together. This similarity coefficient  is calculated as followed in figure~\ref{fig:pagecount}:
+
+\begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/pagecount.png}}
 \caption{Formula for page-count-based WebJaccard similarity \cite{websim}.}
-\label{fig}
+\label{fig:pagecount}
 \end{figure}
 
 For the implementation we used the Google Search API. To use the \textit{search} function properly, some parameters have to be considered as seen in~\ref{lst:googlesearch}: whereas \textit{num} is the number of results and the maximum number is 10, the maximum request number per day is 100. The \textit{pause} between every requests also needs to be adjusted as a too high amount might slow down the process too much and a too low number might end up in an IP block by Google \cite{search}.
@@ -158,7 +162,7 @@ web_results = [0.700, 0.960, 0.564, ...]
 \end{lstlisting}
 
 \subsection{Wu-Palmer-, Path- and Leacock-Chodorow-Similarity}\label{subsec:wup}
-Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for the WuPalmer-Similarity (WUP) as well as the Path-Similarity (PATH) and Leacock-Chodorow-Similarity (LCH). The code segment~\ref{lst:wup} demonstrates the use of the \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} functions on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.
+Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for the WuPalmer-Similarity (WUP) as well as the Path-Similarity (PATH) and Leacock-Chodorow-Similarity (LCH). The code snippet~\ref{lst:wup} demonstrates the use of the \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} functions on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.
 
 \begin{lstlisting}[frame=single, label=lst:wup, caption={Use of WUP, PATH and LCH}, captionpos=b]
 def wordnet_sim(P, Q):
@@ -169,6 +173,7 @@ def wordnet_sim(P, Q):
         for k in range(len(Q)):
 ...
             chod_sim = P[i].lch_similarity(Q[k])
+...
             wup.append(P[i].wup_similarity(Q[k]))
             path.append(P[i].path_similarity(Q[k]))
 \end{lstlisting}
@@ -181,28 +186,64 @@ Besides the pagecount based similarity, the WebSim also includes a websearch sni
 
 Where x is the number of common words, y is the number of combined unique words.
 
-To achieve it, Google's Custom Search JSON API was used to retrieve the search results \cite{customsearch}. First an API key has to be created \cite{customsearch} and a Custom Engine ID (\textit{cx}) generated. These have to be inserted in the corresponding \textit{build()} function to make the source code work. The implementation is shown in the following code segment~ref{lst:snippetsim}:
+To achieve it, Google's Custom Search JSON API was used to retrieve the search results \cite{customsearch}. First an API key has to be created \cite{customsearch} and a Custom Engine ID (\textit{cx}) generated. These have to be inserted in the corresponding \textit{build()} function to make the source code work. The implementation is shown in the following code snippet~\ref{lst:snippetsim}:
 
 \begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
 def google_snippets(query, num=10):
-    query_service = build(serviceName="customsearch", version="v1", developerKey='...') 
+
+    query_service = build(serviceName="customsearch", version="v1", developerKey='...')
+
     query_results = query_service.cse().list(q=query,cx='...', num=num).execute()
      return query_results['items']
 \end{lstlisting}
 
 For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. Based on the formula shown in (TODO) the implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim}):
 
-\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
-def sim_snippets(snipp_p, snipp_q):
+\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Calculation of SnippetSim}, captionpos=b]
+def sim_snippets1(p, q):
   for i in range(5):
-        snippets_p += pre_processing(snippet_p)     
-        snippets_q += pre_processing(snippet_p)
-    
+        snippets_p += pre_processing(p)    
+... 
+        snippets_q += pre_processing(p)
+...    
     common_words = len(set(snippets_p.strip().split(' ')) & set(snippets_q.strip().split(' '))) 
     combined_unique_words = len(set(snippets_p + snippets_q))
     
   return common_words/combined_unique_words
 \end{lstlisting}
+
+\subsection{Snippet Overlapping Similarity}\label{subsec:wup}
+
+Another similarity using snippets is based on overlapping percentage between two phrases. In this paper, it will be shortened as OLSim. This task needs a special pre-processing technique called the Levenshtein distance, also called editing distance. It calculates the number of operations needed to change one phrase to another by changing one character after another. The allowed operations are insertions, deletions and substitutions \cite{navarro}. The formula of the Levenshtein distance is described as followed in picture~\ref{fig:lev}:
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.6]{img/lev.png}}
+\caption{Formula for Levenshtein distance \cite{fuzzy}.}
+\label{fig:lev}
+\end{figure}
+
+The first row corresponds to deletion, the second row to insertion and the third row to substitution \cite{fuzzy}. The Levenshtein ratio is the corresponding similarity ratio derived from the Levenshtein distance \cite{fuzzy} and is defined as followed in~\ref{fig:levratio}:
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.6]{img/levratio.png}}
+\caption{Formula for Levenshtein similarity ratio \cite{fuzzy}.}
+\label{fig:levratio}
+\end{figure}
+
+Similar to SnippetSim, the implementation of the OLSim is roughly as followed in code snippet~\ref{olsim}:
+
+\begin{lstlisting}[frame=single, label=lst:olsim, caption={Calculation of OLSim}, captionpos=b]
+def sim_snippets2(p, q):
+    for i in range(10):
+...
+        snippets_p += pre_processing(p)
+...
+        snippets_q += pre_processing(q)   
+...
+    return round(lev.ratio(snippets_p, snippets_q),4)
+\end{lstlisting}
+
+\subsection{Human Judgement Score}\label{subsec:humanjudge}
 
 \section{Results and discussions}\label{sec:results}
 
