@@ -43,15 +43,16 @@ semantic similarity, natural language processing, language processing, semantic,
 
 \section{Introduction}
 
-In contrast to static semantic similarity analysis methods which are based on lexical search using WordNet, Wikipedia and text corpora \cite{radinsky}, the WebJaccard similarity introduces a more dynamic way to determine the relation of words, since those can change the meanings over time, \cite{websim} for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. \\All methods have their own approaches to calculate the similarities which can be overwhelming for those not knowing how well they perform on the same set of words. For a good comparison between the static approaches with the dynamic methods, the WebJaccard similarity will include the page-count-based similarity as well as the procentual overlap similarity.\\
-Chapter~\ref{sec:methodology} introduces to the tasks for this project and the methodology in which they shall be approached. Chapter~\ref{sec:implementation} shows the implementation details 
+In contrast to static semantic similarity analysis methods which are based on lexical search using WordNet, Wikipedia and text corpora \cite{radinsky}, the WebJaccard similarity (WebSim) introduces a more dynamic way to determine the relation of words, since those can change the meanings over time, \cite{websim} for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. \\All methods have their own approaches to calculate the similarities which can be overwhelming for those not knowing how well they perform on the same set of words. For a good comparison between the static approaches with the dynamic methods, the WebSim will include the page-count-based similarity as well as the procentual overlap similarity.\\
+
+Chapter~\ref{sec:methodology} introduces to the tasks for this project, the used tools and libraries and how the results wil be saved and visualized. Chapter~\ref{sec:implementation} shows the implementation details. In chapter~\ref{sec:results} the achieved results are shown and discussed.  Chapter~\ref{sec:results} concludes this project documentation and sums up the content.
 
 \section{Methodology}\label{sec:methodology}
 
-\subsection{Used libraries}
-As the base for accomplishing the tasks, To illustrate the
+\subsection{Tasks}
 
-\subsection{Used libraries}
+
+\subsection{synsets}
 According to the requirements for this project, the similarity methods have to be applied on at least ten synonym set ("synset") pairs \textit{(P,Q)}. . The pairs should include the three cases, in which a) \textit{P} is a synonym of \textit{Q}, b) \textit{P} is an antonym of \textit{Q}, c) \textit{P} has an entailment relation to \textit{Q}. For the tasks of this project, following synset pairs were selected:
 \begin{itemize}
 \item pleased - excited
@@ -68,9 +69,52 @@ According to the requirements for this project, the similarity methods have to b
 \item contested - won
 \item fell - broken
 \end{itemize}
-Many word pairs are not applicable to use together in some of the similarity methods, since they are not sharing common hypernyms \cite{perkins}. Therefore, the choice of synset pairs is very important for applying and testing them against all similarities. This issue is discussed further in chapter~\ref{subsec:wup}.
+Many synsets are not applicable to use together in some of the similarity methods, since they are not sharing common hypernyms \cite{perkins}. Therefore, the choice of synset pairs is very important for applying and testing them against all similarities. This issue is discussed further in chapter~\ref{subsec:wup}.
+
+\subsection{Tools and Libraries}
+In this project, following tools and packages were used for corresponding purposes:
+\begin{itemize}
+\item NLTK : ...
+\end{itemize}
 
 \section{Implementation}\label{sec:implementation}
+
+\subsection{Preliminary Work}
+For the purposes of understanding and for avoiding recurring code segments, this short chapter shows code segments related to the implementations in the following chapters.
+
+\subsubsection{Visualization of Synsets and Results}
+To visualize the similarity results for the synsets defined in~\ref{sec:methodology}, the synset pairs will be saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
+
+\begin{lstlisting}[frame=single, label=lst:table, caption={}, captionpos=b]]
+sim_layer = [['pleased', 'Excited'], ['run', 'rush'], ...]
+...
+pair_words_df = pd.DataFrame(sim_layer, columns=['P', 'Q'])
+pair_words_df['Column name'] = ''
+
+for i in range(len(synsets)):
+    pair_words_df.iloc[i,k] = ...
+\end{lstlisting}
+
+\subsubsection{Pre-Processing function}\label{sec:preproc}
+In case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character as well as stopwords. The code segment~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the help of the Regular expression operations package \textbf{re}.
+
+\begin{lstlisting}[frame=single, label=lst:preproc, caption={Pre-processing for synsets of word length>1}, captionpos=b]]
+def pre_processing(text):
+
+    text = text.split(' ')
+    text = [word.strip().lower() for word in text if word.lower() not in stopwords]
+    rx = re.compile('([&#.:?!-()])*')
+    text = [rx.sub('', word) for word in text]
+    
+# selecting only the alpha bets and words length greater than 1
+    text = [word for word in text if len(word)>1 and word.isalpha()]
+#     if some word appear more than 1, remove others
+    unique = set(text)
+    unique = [lemmatizer.lemmatize(word) for word in unique]
+    
+# storing after processing in third column
+    return ' '.join(text)
+\end{lstlisting}
 
 \subsection{WebJaccard page count similarity}\label{subsec:webjac}
 The first task consisted of implementing the WebJaccard similarity based on page count and calculate the similarity coefficient. Where \textit{H(P)} in \ref{fig:pagecount} are the results of the pair key P and \textit{H(Q)} the results of pair key Q, \textit{H(PQ)} are the results when searching for P and Q together. This similarity coefficient  is calculated as followed:
@@ -87,7 +131,7 @@ def google_search(query):
     return search(query, lang = 'en', num = 10, start = 0, stop = None, pause = 2.0)
 \end{lstlisting}
 
-Now the function can be used to get the results for each pair (P,Q). To get the page count, the \textit{len()} function is used on the returned \textit{list} of results (see~\ref{lst:hpq}). Once each \textit{H(P)}, \textit{H(Q)} and \textit{H(PQ)} results are saved in according variables \textit{count\_p}, \textit{count\_q} and \textit{count\_pq}, they can be used to calculate the Jaccard similarity coefficient. The \textit{threshold} is used to determine the minimum number of results, otherwise the similarity will be determined as 0. For the chosen synset pairs, there is no need for pre-processing the input since they only contain one word.
+Now the function can be used to get the results for each pair (P,Q). To get the page count, the \textit{len()} function is used on the returned \textit{list} of results (see~\ref{lst:hpq}). Once each \textit{H(P)}, \textit{H(Q)} and \textit{H(PQ)} results are saved in according variables \textit{count\_p}, \textit{count\_q} and \textit{count\_pq}, they can be used to calculate the Jaccard similarity coefficient. The \textit{threshold} is used to determine the minimum number of results. If the number of results is less than the threshold, the coefficient is 0 \cite{websim}. For the chosen synset pairs, there is no need for pre-processing the input since they only contain one word. Since the google API has a limitation of searching for one pair per hour, the values of the WebJaccard similarity had to be calculated one after another. To save the time, the calculated values were saved inthe array \textit{web\_results}.
 
 \begin{lstlisting}[frame=single, label=lst:hpq, caption={Getting google results and calculation of WebJaccard similarity}, captionpos=b]]
 def sim(P, Q, threshold, pre_process=False):
@@ -109,44 +153,12 @@ def sim(P, Q, threshold, pre_process=False):
     
     else:
         return (count_pq) /(count_p + count_q - count_pq)
-\end{lstlisting}
-
-For completeness it should be mentioned, that in case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character. The code snippet~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the help of the Regular expression operations package \textbf{re}.
-
-\begin{lstlisting}[frame=single, label=lst:preproc, caption={Pre-processing for synsets of word length>1}, captionpos=b]]
-def pre_processing(text):
-
-    text = text.split(' ')
-    text = [word.strip().lower() for word in text if word.lower() not in stopwords]
-    rx = re.compile('([&#.:?!-()])*')
-    text = [rx.sub('', word) for word in text]
-    
-# selecting only the alpha bets and words length greater than 1
-    text = [word for word in text if len(word)>1 and word.isalpha()]
-#     if some word appear more than 1, remove others
-    unique = set(text)
-    unique = [lemmatizer.lemmatize(word) for word in unique]
-    
-# storing after processing in third column
-    return ' '.join(text)
-\end{lstlisting}
-
-The use of this function is shown in~\ref{lst:websim}: To apply the function on the decided word pairs defined in~\ref{sec:methodology} and visualize them with their results of the WebJaccard similarity, first the pairs are saved in an array which is here called \textit{sim\_layer}. Then the pairs are saved to a table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. Since the google API has a limitation of searching for one pair per hour, the values of the calculated similarity had to be calculated and saved as pre-determined values in an array called \textit{web\_results}.
-
-\begin{lstlisting}[frame=single, label=lst:websim, caption={}, captionpos=b]]
-sim_layer = [['pleased', 'Excited'], ['run', 'rush'], ...]
+...
 web_results = [0.700, 0.960, 0.564, ...]
-
-pair_words_df = pd.DataFrame(sim_layer, columns=['P', 'Q'])
-pair_words_df['Websim'] = ''
-
-for i in range(len(web_results)):
-    pair_words_df.iloc[i,2] = web_results[i]
 \end{lstlisting}
 
 \subsection{Wu-Palmer-, Path- and Leacock-Chodorow-Similarity}\label{subsec:wup}
-
-Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for the WuPalmer-Similarity (WUP) as well as the Path-Similarity (PATH) and Leacock-Chodorow-Similarity (LCH). The code snippet~\ref{lst:wup} demonstrates the use of the \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} functions on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.
+Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for the WuPalmer-Similarity (WUP) as well as the Path-Similarity (PATH) and Leacock-Chodorow-Similarity (LCH). The code segment~\ref{lst:wup} demonstrates the use of the \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} functions on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.
 
 \begin{lstlisting}[frame=single, label=lst:wup, caption={Use of WUP, PATH and LCH}, captionpos=b]
 def wordnet_sim(P, Q):
@@ -157,16 +169,47 @@ def wordnet_sim(P, Q):
         for k in range(len(Q)):
 ...
             chod_sim = P[i].lch_similarity(Q[k])
-...
             wup.append(P[i].wup_similarity(Q[k]))
             path.append(P[i].path_similarity(Q[k]))
 \end{lstlisting}
 
-As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{wordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac}
+\subsection{Snippet Similarity}\label{subsec:wup}
+
+Besides the pagecount based similarity, the WebSim also includes a websearch snippet based similarity (SnippetSim) which is calculated as followed:
+
+(TODO)
+
+Where x is the number of common words, y is the number of combined unique words.
+
+To achieve it, Google's Custom Search JSON API was used to retrieve the search results \cite{customsearch}. First an API key has to be created \cite{customsearch} and a Custom Engine ID (\textit{cx}) generated. These have to be inserted in the corresponding \textit{build()} function to make the source code work. The implementation is shown in the following code segment~ref{lst:snippetsim}:
+
+\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
+def google_snippets(query, num=10):
+    query_service = build(serviceName="customsearch", version="v1", developerKey='...') 
+    query_results = query_service.cse().list(q=query,cx='...', num=num).execute()
+     return query_results['items']
+\end{lstlisting}
+
+For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. Based on the formula shown in (TODO) the implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim}):
+
+\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
+def sim_snippets(snipp_p, snipp_q):
+  for i in range(5):
+        snippets_p += pre_processing(snippet_p)     
+        snippets_q += pre_processing(snippet_p)
+    
+    common_words = len(set(snippets_p.strip().split(' ')) & set(snippets_q.strip().split(' '))) 
+    combined_unique_words = len(set(snippets_p + snippets_q))
+    
+  return common_words/combined_unique_words
+\end{lstlisting}
 
 \section{Results and discussions}\label{sec:results}
 
-WebSim and SnippetSim also work on buzzword pairs like "Huawei - iPhone" and "Trump - Biden", while WordNet are not able to do that.
+WebSim and SnippetSim also work on buzzwords like "Huawei - iPhone" and "Trump - Biden", while WordNet are not able to do that.
+
+As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{wordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac}
+
 
 \section{Conclusion}\label{sec:conclusion}
 
