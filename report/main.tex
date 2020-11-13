@@ -2,6 +2,7 @@
 \IEEEoverridecommandlockouts
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
+%\usepackage[toc,page]{appendix}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
 \usepackage{graphicx}
@@ -20,7 +21,7 @@
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Project 11: Semantic Analysis}
+\title{Project 11: Semantic Analysis 1}
 
 \author{\IEEEauthorblockN{Dennis Neumann}
 \IEEEauthorblockA{Oulu, Finland\\
@@ -32,7 +33,6 @@ Sherazkhan1234@gmail.com}
 }
 
 \maketitle
-
 \begin{abstract}
 Semantic similarity has been used for multiple tasks regarding natural language processing for many years now. Various static and lexica-based methods for analyzing semantic similarity such as Wu-Palmer and Leacock-Chodorow with different approaches and results exist to determine the similarity between given phrases. This project aims to show how the dynamic and web-based similarity methods of the WebJaccard similarity work in comparison to the static methods with the help of the Python Natural Language Toolkit and google search.
 \end{abstract}
@@ -41,19 +41,18 @@ Semantic similarity has been used for multiple tasks regarding natural language 
 semantic similarity, natural language processing, language processing, semantic, analysis, google search
 \end{IEEEkeywords}
 
+github repository: https://github.com/dneumann20/NLPproject
+
 \section{Introduction}
 
-In contrast to static semantic similarity analysis methods which are based on lexical search using WordNet, Wikipedia and text corpora \cite{radinsky}, the WebJaccard similarity (WebSim) introduces a more dynamic way to determine the relation of words, since those can change the meanings over time, \cite{websim} for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. \\All methods have their own approaches to calculate the similarities which can be overwhelming for those not knowing how well they perform on the same set of words. For a good comparison between the static approaches with the dynamic methods, the WebSim will include the page-count-based similarity as well as the procentual overlap similarity.\\
-
-Chapter~\ref{sec:methodology} introduces to the tasks for this project, the used tools and libraries and how the results wil be saved and visualized. Chapter~\ref{sec:implementation} shows the implementation details. In chapter~\ref{sec:results} the achieved results are shown and discussed.  Chapter~\ref{sec:results} concludes this project documentation and sums up the content.
+Over many decades, for many tasks regarding semantic similarity there have been methods introduced like Wu-Palmer similarity (WUP) \cite{wupalmer}, Path similarity (Path) \cite{resnik} and Leacock-Chodorow Similarity (LCH) \cite{lch}. However, those are static methods which are based on words and phrases from lexica and dictionaries and use WordNet, Wikipedia and text corpora \cite{radinsky}. Since meanings of words or relations to such can change over time \cite{websim}, for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. Therefore, some dynamic approaches like WebJaccard similarity (WebSim) where introduced. Those are based on web search engines and try to determine the correlation between the given words or phrases according to the web search results.\\
+Chapter~\ref{sec:methodology} introduces to the tasks for this project, the used tools and libraries and how the results will be saved for later visualization. Chapter~\ref{sec:implementation} shows the implementation details. In chapter~\ref{sec:results} the achieved results are shown and discussed.  Chapter~\ref{sec:results} concludes this project documentation and sums up the content.
 
 \section{Methodology}\label{sec:methodology}
+%\subsection{Tasks}
 
-\subsection{Tasks}
-
-
-\subsection{synsets}
-According to the requirements for this project, the similarity methods have to be applied on at least ten synonym set ("synset") pairs \textit{(P,Q)}. . The pairs should include the three cases, in which a) \textit{P} is a synonym of \textit{Q}, b) \textit{P} is an antonym of \textit{Q}, c) \textit{P} has an entailment relation to \textit{Q}. For the tasks of this project, following synset pairs were selected:
+\subsection{Word pairs}
+According to the requirements for this project, the similarity methods have to be applied on at least ten synonym set ("synset") pairs \textit{(P,Q)}. . The pairs should include the three cases, in which a) \textit{P} is a synonym of \textit{Q}, b) \textit{P} is an antonym of \textit{Q}, c) \textit{P} has an entailment relation to \textit{Q}. For the tasks of this project, following word pairs were selected:
 \begin{itemize}
 \item pleased - excited
 \item run - rush
@@ -69,12 +68,18 @@ According to the requirements for this project, the similarity methods have to b
 \item contested - won
 \item fell - broken
 \end{itemize}
-Many synsets are not applicable to use together in some of the similarity methods, since they are not sharing common hypernyms \cite{perkins}. Therefore, the choice of synset pairs is very important for applying and testing them against all similarities. This issue is discussed further in chapter~\ref{subsec:wup}.
+Many synsets are not applicable to use together in some of the similarity methods, since they are not sharing common hypernyms \cite{perkins}. Therefore, the choice of word pairs is very important for applying and testing them against all similarities. This issue is discussed further in chapter~\ref{subsec:wup}.
 
 \subsection{Tools and Libraries}
-In this project, following tools and packages were used for corresponding purposes:
 \begin{itemize}
-\item NLTK : ...
+\item Natural Language Toolkit (NLTK): For overall processing human language words
+\item Google Search API and Custom Search API: For later discussed websearch-based similarity methods
+\item Levenshtein: Python package for calculation of Levenshtein distance
+\item re: Regular expression package to process regular expressions
+\item Matplotlib: Calculate data relations
+\item Seaborn: Visualization of calculated data relations
+\item Pandas: For implementation of tables
+\item Tkinter: Python Interface programming
 \end{itemize}
 
 \section{Implementation}\label{sec:implementation}
@@ -84,7 +89,7 @@ For the purposes of understanding and for avoiding recurring code snippets, this
 
 \subsubsection{Visualization of Synsets and Results}
 
-To visualize the similarity results for the synsets defined in~\ref{sec:methodology}, the synset pairs will be saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
+To visualize the similarity results for the synsets defined in~\ref{sec:methodology}, the word pairs will be saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
 
 \begin{lstlisting}[frame=single, label=lst:table, caption={}, captionpos=b]]
 sim_layer = [['pleased', 'Excited'], ['run', 'rush'], ...]
@@ -135,7 +140,7 @@ def google_search(query):
     return search(query, lang = 'en', num = 10, start = 0, stop = None, pause = 2.0)
 \end{lstlisting}
 
-Now the function can be used to get the results for each pair (P,Q). To get the page count, the \textit{len()} function is used on the returned \textit{list} of results (see~\ref{lst:hpq}). Once each \textit{H(P)}, \textit{H(Q)} and \textit{H(PQ)} results are saved in according variables \textit{count\_p}, \textit{count\_q} and \textit{count\_pq}, they can be used to calculate the Jaccard similarity coefficient. The \textit{threshold} is used to determine the minimum number of results. If the number of results is less than the threshold, the coefficient is 0 \cite{websim}. For the chosen synset pairs, there is no need for pre-processing the input since they only contain one word. Since the google API has a limitation of searching for one pair per hour, the values of the WebJaccard similarity had to be calculated one after another. To save the time, the calculated values were saved inthe array \textit{web\_results}.
+Now the function can be used to get the results for each pair (P,Q). To get the page count, the \textit{len()} function is used on the returned \textit{list} of results (see~\ref{lst:hpq}). Once each \textit{H(P)}, \textit{H(Q)} and \textit{H(PQ)} results are saved in according variables \textit{count\_p}, \textit{count\_q} and \textit{count\_pq}, they can be used to calculate the Jaccard similarity coefficient. The \textit{threshold} is used to determine the minimum number of results. If the number of results is less than the threshold, the coefficient is 0 \cite{websim}. For the chosen word pairs, there is no need for pre-processing the input since they only contain one word. Since the google API has a limitation of searching for one pair per hour, the values of the WebJaccard similarity had to be calculated one after another. To save the time, the calculated values were saved inthe array \textit{web\_results}.
 
 \begin{lstlisting}[frame=single, label=lst:hpq, caption={Getting google results and calculation of WebJaccard similarity}, captionpos=b]]
 def sim(P, Q, threshold, pre_process=False):
@@ -172,24 +177,18 @@ def wordnet_sim(P, Q):
     for i in range(len(P)):
         for k in range(len(Q)):
 ...
-            chod_sim = P[i].lch_similarity(Q[k])
+            chod_sim = P.lch_similarity(Q))
 ...
-            wup.append(P[i].wup_similarity(Q[k]))
-            path.append(P[i].path_similarity(Q[k]))
+            wup.append(P.wup_similarity(Q))
+            path.append(P.path_similarity(Q))
 \end{lstlisting}
 
 \subsection{Snippet Similarity}\label{subsec:wup}
 
-Besides the pagecount based similarity, the WebSim also includes a websearch snippet based similarity (SnippetSim) which is calculated as followed:
-
-(TODO)
-
-Where x is the number of common words, y is the number of combined unique words.
-
-To achieve it, Google's Custom Search JSON API was used to retrieve the search results \cite{customsearch}. First an API key has to be created \cite{customsearch} and a Custom Engine ID (\textit{cx}) generated. These have to be inserted in the corresponding \textit{build()} function to make the source code work. The implementation is shown in the following code snippet~\ref{lst:snippetsim}:
+For this task, the similarity between multiple snippets (SnippetSim)  from google search should be calculated. To retrieve the results, Google's Custom Search JSON API was used. First an API key has to be created and a Custom Engine ID (\textit{cx}) generated (see code snippet~\ref{lst:snippetsim}). These have to be inserted in the corresponding function \textit{build()} and class \textit{Customsearch.Cse.List} to make the source code work.
 
 \begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
-def google_snippets(query, num=10):
+def google_snippets1(query, num=10):
 
     query_service = build(serviceName="customsearch", version="v1", developerKey='...')
 
@@ -197,7 +196,7 @@ def google_snippets(query, num=10):
      return query_results['items']
 \end{lstlisting}
 
-For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. Based on the formula shown in (TODO) the implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim}):
+For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. The implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim}):
 
 \begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Calculation of SnippetSim}, captionpos=b]
 def sim_snippets1(p, q):
@@ -212,9 +211,9 @@ def sim_snippets1(p, q):
   return common_words/combined_unique_words
 \end{lstlisting}
 
-\subsection{Snippet Overlapping Similarity}\label{subsec:wup}
+\subsection{Snippet Overlapping Similarity}\label{subsec:olsim}
 
-Another similarity using snippets is based on overlapping percentage between two phrases. In this paper, it will be shortened as OLSim. This task needs a special pre-processing technique called the Levenshtein distance, also called editing distance. It calculates the number of operations needed to change one phrase to another by changing one character after another. The allowed operations are insertions, deletions and substitutions \cite{navarro}. The formula of the Levenshtein distance is described as followed in picture~\ref{fig:lev}:
+Another similarity using snippets is based on overlapping percentage between two phrases. In this report, it will be shortened as OLSim. This task needs a special pre-processing technique called the Levenshtein distance, also called editing distance. It calculates the number of operations needed to change one phrase to another by changing one character after another. The allowed operations are insertions, deletions and substitutions \cite{navarro}. The formula of the Levenshtein distance is described as followed in picture~\ref{fig:lev}:
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/lev.png}}
@@ -230,7 +229,7 @@ The first row corresponds to deletion, the second row to insertion and the third
 \label{fig:levratio}
 \end{figure}
 
-Similar to SnippetSim, the implementation of the OLSim is roughly as followed in code snippet~\ref{olsim}:
+Similar to SnippetSim, the implementation of the OLSim is roughly as followed in code snippet~\ref{lst:olsim}:
 
 \begin{lstlisting}[frame=single, label=lst:olsim, caption={Calculation of OLSim}, captionpos=b]
 def sim_snippets2(p, q):
@@ -245,20 +244,232 @@ def sim_snippets2(p, q):
 
 \subsection{Human Judgement Score}\label{subsec:humanjudge}
 
+In this task, the human judgement score (HJS) according to Miller \& Charles (MC-28)  \cite{miller} was taken to calculate the correlation to the similarity methods from chapter~\ref{subsec:wup} by using the Pearson coefficient. Exceptionally for this case, the following five pairs from the openly available datasets MC-28 \cite{miller} were used:
+
+\begin{itemize}
+\item automobile - car
+\item gem - jewel
+\item journey - voyage
+\item boy - lad
+\item coast - shore
+\end{itemize}
+
+Similar to~\ref{lst:table}, a table is created in code snippet~\ref{lst:hjs} and the mentioned dataset is embedded,
+
+\begin{lstlisting}[frame=single, label=lst:hjs, caption={HJS correlation with WUP, Path, LCH}, captionpos=b]
+df_mc = pd.read_csv('mc.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
+df_rg = pd.read_csv('rg.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
+df_wordsim = pd.read_csv('wordsim.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
+...
+\end{lstlisting}
+
+To calculate and plot each correlation from the table created in the code above, the function in code snippet~\ref{corr} was implemented. 
+
+\begin{lstlisting}[frame=single, label=lst:corr, caption={Correlation calculation function}, captionpos=b]
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plotting_correlation(data, col1, col2):
+    
+    plt.figure(figsize=(10,8))
+    plt.scatter(data[col1], data[col2])
+    sns.despine()
+    sns.set(font_scale=1)
+    corr = round(data[[col1, col2]].corr().iloc[0,1], 3)
+
+    plt.title('Correlation : {}\n\n'.format(corr))
+    plt.xlabel(col1)
+    plt.ylabel(col2)
+    plt.show()
+\end{lstlisting}
+
+Although the final output shows the mentioned pairs earlier in this chapter, it also shows the way how other datasets like RG (Rubenstein and Goodenougth, 1965) or WordSim353 (Finkelstein et al., 2001) can be embedded as well. 
+
+\subsection{Similarity GUI}\label{subsec:gui}
+
+This project also includes a GUI to run all previously implemented similarity methods by clicking corresponding buttons. The source code for the GUI implementation included in the appendix chapter~\ref{sec:append}.
+
 \section{Results and discussions}\label{sec:results}
 
-WebSim and SnippetSim also work on buzzwords like "Huawei - iPhone" and "Trump - Biden", while WordNet are not able to do that.
+\subsection{Results of web-based and lexica-based Solutions}
 
-As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{wordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac}
+As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{wordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac} was to find the right word pairs.\\
+As shown in figure~\ref{fig:simtable}, WebSim outperforms WUP and Path most of the time, LCH being an exception of which the results compared to WebSim. Moreover, WebSim works also on buzzwords like "Huawei - iPhone" while WUP, Path and LCH are not able to use them. SnippetSim overall performs poorly and is not resulting in any similarity on most of the pairs, as the ones with 0 as resulted values seem to have too many unique or too less common words after pre-processing. Other than that, OLSim is results in values which are not too far or in between the values of the static similarity methods, except from "contected - won" which seems to need too many  steps of the Levenshtein distance to process.
 
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.5]{img/table.png}}
+\caption{Results for self defined word pairs on similarity methods from chapters~\ref{subsec:webjac} - \ref{subsec:olsim}.}
+\label{fig:simtable}
+\end{figure}
+
+\subsection{Human Judgement Score and Correlations}
+
+As seen in picture ~\ref{fig:hjs} While the results of WUP and Path differ from the HJS values, LCH comes more closer to latter.
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.6]{img/hjs.png}}
+\caption{Result table of word pairs from MC-28 including WUP, Path and LCH.}
+\label{fig:hjs}
+\end{figure}
+
+The correlation data, as resulted according to picture~\ref{fig:wupcorr} between WUP and HJS is very distributed without any noticeable outliers and the correlation between the measurements is very varying. The resulted correlation coefficient of 0.225 shows a lesser correlation rate between both methods.
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.5]{img/wupcorr.png}}
+\caption{Correlation between HJS and WUP.}
+\label{fig:wupcorr}
+\end{figure}
+
+The correlation results beween Path and HJS, as shown in~\ref{fig:pathcorr}, are noticeably sparsely and linearly distributed in the range between 0 - 0.5 with some positive outliers, and with a correlation coefficient of 0.187 the correlation between those measures are less likely.
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.5]{img/pathcorr.png}}
+\caption{Correlation between HJS and Path.}
+\label{fig:pathcorr}
+\end{figure}
+
+The correlation results beween Path and HJS, as shown in~\ref{fig:lchcorr}, are again more distributed and with a few outliers in higher values and 0. With a correlation rate of 0.152 however, the correlation coefficient proves a very low correlation rate.
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.5]{img/lchcorr.png}}
+\caption{Correlation between HJS and LCH.}
+\label{fig:lchcorr}
+\end{figure}
 
 \section{Conclusion}\label{sec:conclusion}
 
-In this project the 
-
-
+In this project websearch-engine-based dynamic similarity methods were implemented and discussed in comparison to static lexica-based methods. The page-count-based WebSim out-performs the static methods WUP and Path in most cases and can also measure buzzwords. SnippetSim is not a recommendable measurement method for similarity, as it fails on most word pairs. OLSim is more comparable to WUP and Path and can also use buzzwords. HJS shows a low correlation rate to the static methods.
 
 \bibliography{bibtex} 
 \bibliographystyle{ieeetran}
+
+\begin{appendices}
+\section{Source Code of Similarity GUI}\label{sec:append}
+\begin{lstlisting}
+import tkinter as tk
+from tkinter import *
+import pandas as pd
+#from tkinter.ttk import Progressbar
+
+from implementation import sim, wordnet_sim, sim_snippets1
+from implementation import google_snippets, sim_snippets2
+#import sys
+
+from pandastable import Table
+
+def get_values():
+    word1, word2 = entry1.get(), entry2.get()
+    
+    if len(word1) ==0:
+        tk.messagebox.showinfo('Error', 'Please Enter First Word before finding similarity')
+        return None, word2
+        
+    if len(word2) ==0:
+        tk.messagebox.showinfo('Error','Please Enter Second Word before finding similarity')
+        word2=None
+    
+    return word1, word2
+    
+    
+def wordsim(event=None):
+    
+    word1, word2 = get_values()
+    if word1 and word2:
+        value = sim(word1, word2, 5)
+        tk.messagebox.showinfo('Similarity', 'Word Sim Score : ', round(value, 3))
+
+
+def net_sim(event=None):
+     
+    word1, word2 = get_values()
+    if word1 and word2:
+        a,b,c = wordnet_sim(word1, word2)
+        tk.messagebox.showinfo('Wordnet Similarity','WUp: {} , Path: {} , Chod: {}'.
+                           format(a,b,c))
+
+def snippet1(event=None):
+
+    word1, word2 = get_values()        
+    if word1 and word2:
+        snip_p = google_snippets(word1)
+        snip_q = google_snippets(word2)
+        
+        value = sim_snippets1(snip_p, snip_q)
+        tk.messagebox.showinfo('Snippet Similarity','Sim SNippet 1 Score: {}'.
+                           format(round(value, 2)))
+     
+
+
+def snippet2(event=None):
+
+    word1, word2 = get_values()        
+    if word1 and word2:
+        snip_p = google_snippets(word1)
+        snip_q = google_snippets(word2)
+        value = sim_snippets2(snip_p, snip_q)
+        tk.messagebox.showinfo('Snippet Similarity','Sim SNippet 2 Score: {}'.
+                           format(round(value, 2)))
+
+
+
+def exit():
+    root.destroy()
+    
+
+
+def gui():
+    global root, entry1, entry2
+    
+    root = tk.Tk()
+
+    lbl=Label(root, text="Simantic Similarity", fg='#37251F', font=("Helvetica", 20))
+    lbl.place(x=130, y=30)
+    
+    lb_e1=Label(root, text="First Word: ", fg='#37251F', font=("Helvetica", 10))
+    lb_e1.place(x=90,y=90)
+    
+    entry1 = tk.Entry(root) 
+    entry1.place(x=165, y=90, height=30, width=200)
+
+
+
+    lb_e2=Label(root, text="Second Word: ", fg='#37251F', font=("Helvetica", 10))
+    lb_e2.place(x=70,y=140)    
+    entry2 = tk.Entry(root)
+    entry2.place(x=165, y=140, height=30, width=200)
+    
+    
+    
+    x=172
+    button1 = tk.Button(root, text='Web Sim', command=wordsim, fg='white',bg='black', activebackground='#4F2619', height=3,
+                  width = 25)
+    button1.place(x=x, y=190)
+    
+    button2 = tk.Button(root, text='Wordnet Sim', command=net_sim, fg='white',bg='black', activebackground='#4F2619', height=3,
+                  width = 25)
+    button2.place(x=x, y=260)
+    
+    button3 = tk.Button(root, text='Sim Snippet 1', command=snippet1, fg='white',bg='black', activebackground='#4F2619', height=3,
+                  width = 25)
+    button3.place(x=x, y=330)
+    
+    button4 = tk.Button(root, text='Sim Snippet 2', command=snippet2, fg='white',bg='black', activebackground='#4F2619', height=3,
+                  width = 25)
+    button4.place(x=x, y=400)
+
+    button5 = tk.Button(root, text='Exit', command=exit, fg='white',bg='black', activebackground='#4F2619', height=3,
+                  width = 25)
+    button5.place(x=x, y=470)
+    
+    root.title('Application')
+    root.geometry("500x650+300+20")
+    root.mainloop()
+
+
+if __name__ == '__main__':
+
+    gui()
+\end{lstlisting}
+\end{appendices}
 
 \end{document}
