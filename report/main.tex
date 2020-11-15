@@ -28,31 +28,30 @@
 dennis2.neumann@student.uni-siegen.de}
 \and
 \IEEEauthorblockN{Muhammad Sheraz Khan}
-\IEEEauthorblockA{City, Pakistan\\
+\IEEEauthorblockA{Oulu, Finland\\
 Sherazkhan1234@gmail.com}
 }
 
 \maketitle
 \begin{abstract}
-Semantic similarity has been used for multiple tasks regarding natural language processing for many years now. Various static and lexica-based methods for analyzing semantic similarity such as Wu-Palmer and Leacock-Chodorow with different approaches and results exist to determine the similarity between given phrases. This project aims to show how the dynamic and web-based similarity methods of the WebJaccard similarity work in comparison to the static methods with the help of the Python Natural Language Toolkit and google search.
+Semantic similarity has been used for multiple tasks regarding natural language processing for many years now. Various static and lexica-based methods for analyzing semantic similarity such as Wu-Palmer and Leacock-Chodorow with different approaches and results exist to determine the similarity between given phrases. This project aims to show how dynamic and web-based similarity methods work in comparison to the static methods with the help of the Python Natural Language Toolkit and Google Search API.
 \end{abstract}
 
 \begin{IEEEkeywords}
 semantic similarity, natural language processing, language processing, semantic, analysis, google search
 \end{IEEEkeywords}
 
-github repository: https://github.com/dneumann20/NLPproject
-
 \section{Introduction}
 
-Over many decades, for many tasks regarding semantic similarity there have been methods introduced like Wu-Palmer similarity (WUP) \cite{wupalmer}, Path similarity (Path) \cite{resnik} and Leacock-Chodorow Similarity (LCH) \cite{lch}. However, those are static methods which are based on words and phrases from lexica and dictionaries and use WordNet, Wikipedia and text corpora \cite{radinsky}. Since meanings of words or relations to such can change over time \cite{websim}, for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. Therefore, some dynamic approaches like WebJaccard similarity (WebSim) where introduced. Those are based on web search engines and try to determine the correlation between the given words or phrases according to the web search results.\\
-Chapter~\ref{sec:methodology} introduces to the tasks for this project, the used tools and libraries and how the results will be saved for later visualization. Chapter~\ref{sec:implementation} shows the implementation details. In chapter~\ref{sec:results} the achieved results are shown and discussed.  Chapter~\ref{sec:results} concludes this project documentation and sums up the content.
+Over many decades, for many tasks regarding semantic similarity there have been methods introduced. Based on the proposal of Rada et. al. \cite{rada89}, similarity of synonym sets (synsets) describes the minimum distance from one node to another in a taxonomical tree. Since this approach assumes, that the links in the taxonomy represent uniform distances \cite{resnik} between two words, some approaches derive their own measurement methods which try to solve this problem. Wu-Palmer similarity (WUP) \cite{wupalmer}, Path similarity (PATH) \cite{resnik} and Leacock-Chodorow Similarity (LCH) \cite{lch} proposed their own approaches and use the English database WordNet, which groups English words into synonym sets (synsets) according to similar meanings and lexical relations \cite{wordnet}. WUP considers the depth in two synsets, as concepts of words become more similar the lower they lie in the ontological hypernim tree \cite{wupmod}. PATH calculates the shortest distance between the synsets, but other than the solution of Rada et. al, it considers the fact, that some sub-trees of a taxonomy are deeper than others \cite{resnik}. LCH calculates the overall shortest path between two given concepts \cite{slimani} to their common hypernyms in the taxonomy tree \cite{perkins}.\\
+However, those are static methods and only work on formal words, not considering slang or buzzwords. Moreover, meanings of words or relations to such can change over time \cite{websim}, for example the word \textit{Tesla} nowadays can not only be associated with Nikola Tesla but also with the electric car brand of the same name. Therefore, this project aims to show some dynamic approaches like the WebJaccard similarity (WebSim). Those are based on web search engines and try to determine the correlation between the given words or phrases according to the web search results.\\
+Chapter~\ref{sec:methodology} introduces to the used tools and libraries. Chapter~\ref{sec:implementation} shows the implementation details. In chapter~\ref{sec:results} the achieved results are shown and discussed.  Chapter~\ref{sec:results} concludes this project documentation and sums up the content.
 
 \section{Methodology}\label{sec:methodology}
-%\subsection{Tasks}
 
 \subsection{Word pairs}
-According to the requirements for this project, the similarity methods have to be applied on at least ten synonym set ("synset") pairs \textit{(P,Q)}. . The pairs should include the three cases, in which a) \textit{P} is a synonym of \textit{Q}, b) \textit{P} is an antonym of \textit{Q}, c) \textit{P} has an entailment relation to \textit{Q}. For the tasks of this project, following word pairs were selected:
+
+According to the requirements for this project, the similarity methods have to be applied on at least ten synonym sets pairs \textit{(P,Q)}. The pairs should include the three cases, in which a) \textit{P} is a synonym of \textit{Q}, b) \textit{P} is an antonym of \textit{Q}, c) \textit{P} has an entailment relation to \textit{Q}. For the tasks of this project, following word pairs were selected:
 \begin{itemize}
 \item pleased - excited
 \item run - rush
@@ -72,24 +71,29 @@ Many synsets are not applicable to use together in some of the similarity method
 
 \subsection{Tools and Libraries}
 \begin{itemize}
-\item Natural Language Toolkit (NLTK): For overall processing human language words
-\item Google Search API and Custom Search API: For later discussed websearch-based similarity methods
-\item Levenshtein: Python package for calculation of Levenshtein distance
-\item re: Regular expression package to process regular expressions
-\item Matplotlib: Calculate data relations
-\item Seaborn: Visualization of calculated data relations
-\item Pandas: For implementation of tables
-\item Tkinter: Python Interface programming
+\item \textbf{Natural Language Toolkit (NLTK)}: For overall processing human language words
+\item \textbf{Google Search API} and \textbf{Custom Search API}: For later discussed websearch-based similarity methods
+\item \textbf{Levenshtein}: Python package for calculation of Levenshtein distance
+\item \textbf{re}: Regular expression package to process regular expressions
+\item \textbf{Matplotlib}: Calculate data relations
+\item \textbf{Seaborn}: Visualization of calculated data relations
+\item \textbf{Pandas}: For implementation of tables
+\item \textbf{Tkinter}: Python Interface programming
 \end{itemize}
 
 \section{Implementation}\label{sec:implementation}
 
 \subsection{Preliminary Work}
-For the purposes of understanding and for avoiding recurring code snippets, this short chapter shows code snippets related to the implementations in the following chapters.
+
+For the purposes of understanding and for avoiding recurring code segments, this short chapter shows code snippets related to the implementations in the following chapters.
+
+\subsubsection{Gihub Repository}
+
+The source code and this report are available in the following Github repository: https://github.com/dneumann20/NLPproject.
 
 \subsubsection{Visualization of Synsets and Results}
 
-To visualize the similarity results for the synsets defined in~\ref{sec:methodology}, the word pairs will be saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
+To visualize the similarity results for the word pairs defined in chapter~\ref{sec:methodology}, the word pairs are saved to the table \textit{pair\_words\_df} via the \textit{DataFrame} Python class. For every similarity, 
 
 \begin{lstlisting}[frame=single, label=lst:table, caption={}, captionpos=b]]
 sim_layer = [['pleased', 'Excited'], ['run', 'rush'], ...]
@@ -103,7 +107,7 @@ for i in range(len(synsets)):
 
 \subsubsection{Pre-Processing function}\label{sec:preproc}
 
-In case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character as well as stopwords. The code snippet~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the help of the Regular expression operations package \textbf{re}.
+In case of synsets of word length>1,  pre-processing should be performed. It has to contain the conversion in lower case, removal of special characters and lemmatizer for removing words with only one character as well as stopwords. The code snippet~\ref{lst:preproc} demonstrates the important steps taken for the pre-processing with the python package \textbf{re}.
 
 \begin{lstlisting}[frame=single, label=lst:preproc, caption={Pre-processing for synsets of word length>1}, captionpos=b]]
 def pre_processing(text):
@@ -125,7 +129,7 @@ def pre_processing(text):
 
 \subsection{WebJaccard page count similarity}\label{subsec:webjac}
 
-The first task consisted of implementing the WebJaccard similarity based on page count and calculate the similarity coefficient. Where \textit{H(P)} in \ref{fig:pagecount} are the results of the pair key P and \textit{H(Q)} the results of pair key Q, \textit{H(PQ)} are the results when searching for P and Q together. This similarity coefficient  is calculated as followed in figure~\ref{fig:pagecount}:
+The first task consists of implementing the WebJaccard similarity based on page count and calculate the similarity coefficient. Where \textit{H(P)} in \ref{fig:pagecount} are the results of the pair key P and \textit{H(Q)} the results of pair key Q, \textit{H(PQ)} are the results when searching for P and Q together. This similarity coefficient  is calculated as followed in figure~\ref{fig:pagecount}:
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/pagecount.png}}
@@ -133,7 +137,7 @@ The first task consisted of implementing the WebJaccard similarity based on page
 \label{fig:pagecount}
 \end{figure}
 
-For the implementation we used the Google Search API. To use the \textit{search} function properly, some parameters have to be considered as seen in~\ref{lst:googlesearch}: whereas \textit{num} is the number of results and the maximum number is 10, the maximum request number per day is 100. The \textit{pause} between every requests also needs to be adjusted as a too high amount might slow down the process too much and a too low number might end up in an IP block by Google \cite{search}.
+For the implementation the Google Search API was used. For proper use of the \textit{search()} function, some parameters have to be considered as seen in~\ref{lst:googlesearch}: whereas \textit{num} is the number of results and the maximum number is 10, the maximum request number per day is 100. The \textit{pause} between every requests also needs to be adjusted as a too high amount might slow down the process too much and a too low number might end up in an IP block by Google \cite{search}.
 
 \begin{lstlisting}[frame=single, label=lst:googlesearch, caption={Google search function}, captionpos=b]
 def google_search(query):
@@ -167,27 +171,37 @@ web_results = [0.700, 0.960, 0.564, ...]
 \end{lstlisting}
 
 \subsection{Wu-Palmer-, Path- and Leacock-Chodorow-Similarity}\label{subsec:wup}
-Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for the WuPalmer-Similarity (WUP) as well as the Path-Similarity (PATH) and Leacock-Chodorow-Similarity (LCH). The code snippet~\ref{lst:wup} demonstrates the use of the \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} functions on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.
+
+Unlike the WebJaccard similarity which has to be implemented manually, the WordNet Python library has predefined functions for WUP as well as PATH and LCH. This way, \textit{wup\_similarity()}, \textit{path\_similarity()} and \textit{lch\_similarity()} can be easily used on the self defined synsets from~\ref{sec:methodology}. The only pre-processing which has to be taken care of is to convert all synset's characters to lower case.\\
+As seen in picture~\ref{fig:wupform}, WUP takes the depths of each synset as well as their least common subsumer (LCS) in account \cite{mohit}:
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.4]{img/wupalmer.jpg}}
+\caption{Formula of WUP \cite{mohit}.}
+\label{fig:wupform}
+\end{figure}
+
+LCH as a derived form of PATH is calculated as a negative log of shortest path (spath) of two phrases\cite{mohit}. The formula is described as followed in pciture~\ref{fig:lchform}:
+
+\begin{figure}[h]
+\centerline{\includegraphics[scale=0.4]{img/lch.jpg}}
+\caption{Formula of LCH \cite{mohit}.}
+\label{fig:lchform}
+\end{figure}
+
+Code snippet~\ref{lst:wup} shows the use of the predefined similarity functions mentioned above.
 
 \begin{lstlisting}[frame=single, label=lst:wup, caption={Use of WUP, PATH and LCH}, captionpos=b]
-def wordnet_sim(P, Q):
-    P=wordnet.synsets(P.lower())
-    Q=wordnet.synsets(Q.lower())
-
-    for i in range(len(P)):
-        for k in range(len(Q)):
-...
-            chod_sim = P.lch_similarity(Q))
-...
-            wup.append(P.wup_similarity(Q))
-            path.append(P.path_similarity(Q))
+P.lch_similarity(Q)
+P.wup_similarity(Q)
+P.path_similarity(Q)
 \end{lstlisting}
 
 \subsection{Snippet Similarity}\label{subsec:wup}
 
-For this task, the similarity between multiple snippets (SnippetSim)  from google search should be calculated. To retrieve the results, Google's Custom Search JSON API was used. First an API key has to be created and a Custom Engine ID (\textit{cx}) generated (see code snippet~\ref{lst:snippetsim}). These have to be inserted in the corresponding function \textit{build()} and class \textit{Customsearch.Cse.List} to make the source code work.
+For this task, the similarity between multiple snippets (SnippetSim)  from google search have to be calculated. To retrieve the results, Google's Custom Search JSON API was used. First an API key has to be created and a Custom Engine ID (\textit{cx}) generated (see code snippet~\ref{lst:snippetsim1}). These have to be inserted in the corresponding function \textit{build()} and class \textit{Customsearch.Cse.List} to make the source code work.
 
-\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Connection to Google Search API}, captionpos=b]
+\begin{lstlisting}[frame=single, label=lst:snippetsim1, caption={Connection to Google Search API}, captionpos=b]
 def google_snippets1(query, num=10):
 
     query_service = build(serviceName="customsearch", version="v1", developerKey='...')
@@ -196,9 +210,9 @@ def google_snippets1(query, num=10):
      return query_results['items']
 \end{lstlisting}
 
-For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. The implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim}):
+For this similarity, the preprocessing function~\ref{lst:preproc} from chapter~\ref{sec:preproc} has to be used. For the calculation of the SnippetSim in this project, the first 5 results were taken. The implementation of the SnippetSim looks roughly as followed in~\ref{lst:snippetsim2}):
 
-\begin{lstlisting}[frame=single, label=lst:snippetsim, caption={Calculation of SnippetSim}, captionpos=b]
+\begin{lstlisting}[frame=single, label=lst:snippetsim2, caption={Calculation of SnippetSim}, captionpos=b]
 def sim_snippets1(p, q):
   for i in range(5):
         snippets_p += pre_processing(p)    
@@ -213,7 +227,7 @@ def sim_snippets1(p, q):
 
 \subsection{Snippet Overlapping Similarity}\label{subsec:olsim}
 
-Another similarity using snippets is based on overlapping percentage between two phrases. In this report, it will be shortened as OLSim. This task needs a special pre-processing technique called the Levenshtein distance, also called editing distance. It calculates the number of operations needed to change one phrase to another by changing one character after another. The allowed operations are insertions, deletions and substitutions \cite{navarro}. The formula of the Levenshtein distance is described as followed in picture~\ref{fig:lev}:
+Another similarity using snippets is based on overlapping percentage between two phrases. In this report, it will be shortened as OLSim. This task needs a special pre-processing technique called the Levenshtein distance \cite{levenshtein}, also called editing distance. It calculates the number of operations needed to change one phrase to another by changing one character after another. The allowed operations are insertions, deletions and substitutions \cite{navarro}. The formula of the Levenshtein distance is described as followed in picture~\ref{fig:lev}:
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/lev.png}}
@@ -221,7 +235,7 @@ Another similarity using snippets is based on overlapping percentage between two
 \label{fig:lev}
 \end{figure}
 
-The first row corresponds to deletion, the second row to insertion and the third row to substitution \cite{fuzzy}. The Levenshtein ratio is the corresponding similarity ratio derived from the Levenshtein distance \cite{fuzzy} and is defined as followed in~\ref{fig:levratio}:
+The first row corresponds to deletion, the second row to insertion and the third row to substitution \cite{fuzzy}. The Levenshtein ratio is the corresponding similarity ratio derived from the Levenshtein distance \cite{fuzzy} and is defined in picture~\ref{fig:levratio}:
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/levratio.png}}
@@ -254,36 +268,32 @@ In this task, the human judgement score (HJS) according to Miller \& Charles (MC
 \item coast - shore
 \end{itemize}
 
-Similar to~\ref{lst:table}, a table is created in code snippet~\ref{lst:hjs} and the mentioned dataset is embedded,
+Similar to~\ref{lst:table}, a table is created in code snippet~\ref{lst:hjs} and the mentioned dataset is embedded.
 
-\begin{lstlisting}[frame=single, label=lst:hjs, caption={HJS correlation with WUP, Path, LCH}, captionpos=b]
+\begin{lstlisting}[frame=single, label=lst:hjs, caption={HJS correlation with WUP, PATH, LCH}, captionpos=b]
 df_mc = pd.read_csv('mc.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
 df_rg = pd.read_csv('rg.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
 df_wordsim = pd.read_csv('wordsim.csv', sep=';', names=['Word 1', 'Word 2', 'Human Judgement Score'])
 ...
+data = pd.concat([df_mc, df_rg, df_wordsim])
+data.head()
 \end{lstlisting}
 
-To calculate and plot each correlation from the table created in the code above, the function in code snippet~\ref{corr} was implemented. 
+Although the final output shows the mentioned pairs earlier in this chapter, it also shows the way how other datasets like RG (Rubenstein and Goodenougth, 1965) or WordSim353 (Finkelstein et al., 2001) can be embedded as well.\\
+To calculate and plot each correlation from the table created in the code above, the function in code snippet~\ref{lst:corr} was implemented. For the visualization, the \textit{scatter} plot was used and the \textit{despine} function for the removal of unnecessary axis. After that the correlation can be calculated with the \textit{corr()} function.
 
 \begin{lstlisting}[frame=single, label=lst:corr, caption={Correlation calculation function}, captionpos=b]
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 def plotting_correlation(data, col1, col2):
-    
-    plt.figure(figsize=(10,8))
+    ...
     plt.scatter(data[col1], data[col2])
     sns.despine()
-    sns.set(font_scale=1)
     corr = round(data[[col1, col2]].corr().iloc[0,1], 3)
-
-    plt.title('Correlation : {}\n\n'.format(corr))
-    plt.xlabel(col1)
-    plt.ylabel(col2)
+   ...
     plt.show()
 \end{lstlisting}
-
-Although the final output shows the mentioned pairs earlier in this chapter, it also shows the way how other datasets like RG (Rubenstein and Goodenougth, 1965) or WordSim353 (Finkelstein et al., 2001) can be embedded as well. 
 
 \subsection{Similarity GUI}\label{subsec:gui}
 
@@ -293,8 +303,8 @@ This project also includes a GUI to run all previously implemented similarity me
 
 \subsection{Results of web-based and lexica-based Solutions}
 
-As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{wordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac} was to find the right word pairs.\\
-As shown in figure~\ref{fig:simtable}, WebSim outperforms WUP and Path most of the time, LCH being an exception of which the results compared to WebSim. Moreover, WebSim works also on buzzwords like "Huawei - iPhone" while WUP, Path and LCH are not able to use them. SnippetSim overall performs poorly and is not resulting in any similarity on most of the pairs, as the ones with 0 as resulted values seem to have too many unique or too less common words after pre-processing. Other than that, OLSim is results in values which are not too far or in between the values of the static similarity methods, except from "contected - won" which seems to need too many  steps of the Levenshtein distance to process.
+As mentioned in chapter~\ref{sec:methodology}, many pair words exist in which the combination of such do not work together, which causes some of the methods showing the similarity results as "None" \cite{perkins}, or in the case of LCH the pairs cause a compilation error "Computing the lch similarity requires synset1 and synset2 to have the same part of speech" \cite{nltkwordnet}. So one of the challenges with the tasks in chapter~\ref{subsec:wup} and \ref{subsec:webjac} was to find the right word pairs.\\
+As shown in picture~\ref{fig:simtable}, WebSim outperforms WUP and PATH most of the time, LCH being an exception of which the results compared to WebSim. Moreover, WebSim works also on buzzwords like "Huawei - iPhone" while WUP, PATH and LCH are not able to use them. SnippetSim overall performs poorly and is not resulting in any similarity on most of the pairs, as the ones with 0 as resulted values seem to have too many unique or too less common words after pre-processing. Other than that, OLSim is results in values which are not too far or in between the values of the static similarity methods, except from "contected - won" which seems to need too many  steps of the Levenshtein distance to process.
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.5]{img/table.png}}
@@ -302,13 +312,14 @@ As shown in figure~\ref{fig:simtable}, WebSim outperforms WUP and Path most of t
 \label{fig:simtable}
 \end{figure}
 
+\newpage
 \subsection{Human Judgement Score and Correlations}
 
-As seen in picture ~\ref{fig:hjs} While the results of WUP and Path differ from the HJS values, LCH comes more closer to latter.
+As seen in picture~\ref{fig:hjs}, while the results of WUP and PATH differ from the HJS values, LCH comes more closer to latter.
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.6]{img/hjs.png}}
-\caption{Result table of word pairs from MC-28 including WUP, Path and LCH.}
+\caption{Result table of word pairs from MC-28 including WUP, PATH and LCH.}
 \label{fig:hjs}
 \end{figure}
 
@@ -320,15 +331,15 @@ The correlation data, as resulted according to picture~\ref{fig:wupcorr} between
 \label{fig:wupcorr}
 \end{figure}
 
-The correlation results beween Path and HJS, as shown in~\ref{fig:pathcorr}, are noticeably sparsely and linearly distributed in the range between 0 - 0.5 with some positive outliers, and with a correlation coefficient of 0.187 the correlation between those measures are less likely.
+The correlation results beween PATH and HJS, as shown in~\ref{fig:pathcorr}, are noticeably sparsely and linearly distributed in the range between 0 - 0.5 with some positive outliers, and with a correlation coefficient of 0.187 the correlation between those measures are less likely.
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.5]{img/pathcorr.png}}
-\caption{Correlation between HJS and Path.}
+\caption{Correlation between HJS and PATH.}
 \label{fig:pathcorr}
 \end{figure}
 
-The correlation results beween Path and HJS, as shown in~\ref{fig:lchcorr}, are again more distributed and with a few outliers in higher values and 0. With a correlation rate of 0.152 however, the correlation coefficient proves a very low correlation rate.
+The correlation results beween PATH and HJS, as shown in~\ref{fig:lchcorr}, are again more distributed and with a few outliers in higher values and 0. With a correlation rate of 0.152 however, the correlation coefficient proves a very low correlation rate.
 
 \begin{figure}[h]
 \centerline{\includegraphics[scale=0.5]{img/lchcorr.png}}
@@ -338,11 +349,12 @@ The correlation results beween Path and HJS, as shown in~\ref{fig:lchcorr}, are 
 
 \section{Conclusion}\label{sec:conclusion}
 
-In this project websearch-engine-based dynamic similarity methods were implemented and discussed in comparison to static lexica-based methods. The page-count-based WebSim out-performs the static methods WUP and Path in most cases and can also measure buzzwords. SnippetSim is not a recommendable measurement method for similarity, as it fails on most word pairs. OLSim is more comparable to WUP and Path and can also use buzzwords. HJS shows a low correlation rate to the static methods.
+In this project websearch-engine-based dynamic similarity methods were implemented and discussed in comparison to static lexica-based methods.  HJS shows a low correlation rate to the static methods, proving that they are less reliable similarity measurements.. The page-count-based WebSim out-performs the static methods WUP and PATH in most cases and can also measure buzzwords. SnippetSim is not a recommendable measurement method for similarity, as it fails on most word pairs with resulting values of 0. OLSim is more comparable to WUP and PATH and can also use buzzwords. It should be also assumed, that even a high similarity between two pairs can end up in having a bad result if the snippets contain the same contexts but different wordings, as the websearch results are always changing over time. Furthermore, getting the needed websearch results can take time due to the Google Search API'S limit of 100 requests per day, which is the biggest disadvantage of the dynamic methods.
 
 \bibliography{bibtex} 
 \bibliographystyle{ieeetran}
 
+\newpage
 \begin{appendices}
 \section{Source Code of Similarity GUI}\label{sec:append}
 \begin{lstlisting}
@@ -431,14 +443,10 @@ def gui():
     entry1 = tk.Entry(root) 
     entry1.place(x=165, y=90, height=30, width=200)
 
-
-
     lb_e2=Label(root, text="Second Word: ", fg='#37251F', font=("Helvetica", 10))
     lb_e2.place(x=70,y=140)    
     entry2 = tk.Entry(root)
     entry2.place(x=165, y=140, height=30, width=200)
-    
-    
     
     x=172
     button1 = tk.Button(root, text='Web Sim', command=wordsim, fg='white',bg='black', activebackground='#4F2619', height=3,
